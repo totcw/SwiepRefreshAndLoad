@@ -29,6 +29,7 @@ import android.graphics.drawable.shapes.OvalShape;
 
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.animation.Animation;
 import android.widget.ImageView;
 

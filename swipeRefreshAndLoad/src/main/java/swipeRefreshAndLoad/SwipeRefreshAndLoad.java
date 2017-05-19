@@ -133,6 +133,9 @@ public class SwipeRefreshAndLoad extends ViewGroup implements NestedScrollingPar
 
     boolean mRefreshingBottom = false;
 
+     boolean isRefresh=true; //控制是否下拉刷新
+     boolean isRefreshBottom=true;//控制是否上啦加载
+
     ScrollView s;
 
     private int mTouchSlop;
@@ -691,6 +694,10 @@ public class SwipeRefreshAndLoad extends ViewGroup implements NestedScrollingPar
         }
     }
 
+    /**
+     * false 取消刷新
+     * @param refreshing
+     */
     public void setBottomRefreshing(boolean refreshing) {
 
         if (refreshing && mRefreshingBottom != refreshing) {
@@ -1169,6 +1176,8 @@ public class SwipeRefreshAndLoad extends ViewGroup implements NestedScrollingPar
      * scroll up. Override this if the child view is a custom view.
      */
     public boolean canChildScrollUp() {
+
+
         if (mChildScrollUpCallback != null) {
             Log.e("fish", "canChildScrollUp;mChildScrollUpCallback != null");
             return mChildScrollUpCallback.canChildScrollUp(this, mTarget);
@@ -1202,6 +1211,7 @@ public class SwipeRefreshAndLoad extends ViewGroup implements NestedScrollingPar
      * 判断是否而已向下拉
      */
     public boolean canChildScrollDown() {
+
         return ViewCompat.canScrollVertically(mTarget, 1);
     }
 
@@ -1231,7 +1241,7 @@ public class SwipeRefreshAndLoad extends ViewGroup implements NestedScrollingPar
          *
          * canChildScrollUp 子view还可以向上拉
          * */
-        if (!isEnabled() || mReturningToStart || canChildScrollUp()
+        if (!isEnabled() || mReturningToStart || canChildScrollUp()||canChildScrollDown()||mRefreshingBottom
                 || mRefreshing || mNestedScrollInProgress) {
             // Fail fast if we're not in a state where a swipe is possible
             return false;
@@ -1556,6 +1566,7 @@ public class SwipeRefreshAndLoad extends ViewGroup implements NestedScrollingPar
      * @param overscrollTop 滑动的绝对值
      */
     private void moveBottomSpinner(float overscrollTop) {
+
         mProgressBottom.showArrow(true);
         float originalDragPercent = overscrollTop / mTotalDragDistance;
         float dragPercent = Math.min(1f, Math.abs(originalDragPercent));
@@ -1612,6 +1623,8 @@ public class SwipeRefreshAndLoad extends ViewGroup implements NestedScrollingPar
      * 进行实际circle的滑动绘制，包括颜色等设置
      */
     private void moveSpinner(float overscrollTop) {
+
+
         if (mRefreshingBottom) {
             return;
         }
@@ -1762,7 +1775,7 @@ public class SwipeRefreshAndLoad extends ViewGroup implements NestedScrollingPar
             mReturningToStart = false;
         }
         Log.e("fish", "-onTouchEvent-;ACTION==" + ev.getAction());
-        if (!isEnabled() || mReturningToStart || canChildScrollUp()
+        if (!isEnabled() || mReturningToStart || canChildScrollUp()||canChildScrollDown()||mRefreshingBottom
                 || mRefreshing || mNestedScrollInProgress) {
             // Fail fast if we're not in a state where a swipe is possible
             return false;
@@ -2119,7 +2132,7 @@ public class SwipeRefreshAndLoad extends ViewGroup implements NestedScrollingPar
                 int moveY = (int) (ev.getY() - downY);
                 int scrollY = getScrollY();
                 int height = bottomLoadView.getMeasuredHeight();
-                //先
+                //如果是下拉,就先将底部view还原
                 if (moveY > 0) {
                     if (scrollY <= height && scrollY > 0) {
                         if (scrollY - moveY > height) {
@@ -2146,6 +2159,7 @@ public class SwipeRefreshAndLoad extends ViewGroup implements NestedScrollingPar
      * 设置没有数据了
      */
     public void setNoMore() {
+        setBottomRefreshing(false);
         mTvLoad.setText("没有更多数据了!");
         scrollTo(0, bottomLoadView.getMeasuredHeight());
         bottomLoadView.setOnClickListener(null);
@@ -2155,6 +2169,7 @@ public class SwipeRefreshAndLoad extends ViewGroup implements NestedScrollingPar
      * 加载失败
      */
     public void setError(OnClickListener onClickListener) {
+        setBottomRefreshing(false);
         mTvLoad.setText("点击重试!");
         scrollTo(0, bottomLoadView.getMeasuredHeight());
         bottomLoadView.setOnClickListener(new MyClickListener(onClickListener));
@@ -2176,4 +2191,19 @@ public class SwipeRefreshAndLoad extends ViewGroup implements NestedScrollingPar
         }
     }
 
+    /**
+     * 设置是否开启下拉刷新
+     * @param refresh
+     */
+    public void setRefresh(boolean refresh) {
+        isRefresh = refresh;
+    }
+
+    /**
+     * 设置是否开始上拉加载
+     * @param refreshBottom
+     */
+    public void setRefreshBottom(boolean refreshBottom) {
+        isRefreshBottom = refreshBottom;
+    }
 }

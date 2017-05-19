@@ -68,10 +68,20 @@ public class ApiShowFragment extends Fragment {
             switch (msg.what) {
                 case 0:
                     if(refreshLayout.isRefreshing())
+                        //停止刷新
                         refreshLayout.setRefreshing(false);
                     break;
                 case 1:
-                    cancleLoading();
+                    //停止上啦加载
+                    refreshLayout.setBottomRefreshing(false);
+                    //设置加载错误的点击事件
+                    refreshLayout.setError(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            refreshLayout.setBottomRefreshing(true);
+                        }
+                    });
                     break;
             }
 
@@ -120,6 +130,7 @@ public class ApiShowFragment extends Fragment {
 
     /**初始化刷新控件*/
     private void initRefreshLayout() {
+        //设置下拉刷新的进度条颜色
         refreshLayout.setColorSchemeColors(Color.YELLOW,Color.RED,Color.GREEN,Color.BLUE);
         refreshLayout.setOnRefreshListener(new SwipeRefreshAndLoad.OnRefreshListener() {
             @Override
@@ -129,15 +140,15 @@ public class ApiShowFragment extends Fragment {
                 hd.sendEmptyMessageDelayed(0,3000);
             }
         });
-
+        //设置上啦加载的进度条颜色
         refreshLayout.setBottomColorSchemeColors(Color.GREEN,Color.BLUE,Color.YELLOW,Color.RED);
-        //在这里新增下拉刷新方法
+        refreshLayout.setRefreshBottom(false);
+        //在这里新增上啦加载的回调
         refreshLayout.setOnBottomRefreshListenrer(new SwipeRefreshAndLoad.OnBottomRefreshListener() {
             @Override
             public void onBottomRefresh() {
 
-              //  Snackbar.make(recyclerView,"下拉刷新了",Snackbar.LENGTH_SHORT).show();
-                hd.sendEmptyMessageDelayed(1,6000);
+                hd.sendEmptyMessageDelayed(1,3000);
 
             }
         });
